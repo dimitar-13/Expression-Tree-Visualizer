@@ -9,7 +9,15 @@ int main()
     // 3 + *
     // +
 
-    ExpressionTree testTree("3*5+6*7+5*7+2");
+    // (3 + 6)*8+(3+7)
+    //
+
+
+    // (1+2)*3
+    // (a+b)*c
+    // 
+
+    ExpressionTree testTree("(2*(3+4)*5*(3+4))*3");
 
     testTree.PrintAllLeft();
 }
