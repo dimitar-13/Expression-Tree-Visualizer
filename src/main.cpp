@@ -17,7 +17,11 @@ int main()
     // (a+b)*c
     // 
 
-    ExpressionTree testTree("(2*(3+4)*5*(3+4))*3");
+    ExpressionTree testTree("1-3*5^7");
 
-    testTree.PrintAllLeft();
+    testTree.PrintPostfix();
+
+    std::cout << '\n';
+
+    testTree.PrintPrefix();
 }

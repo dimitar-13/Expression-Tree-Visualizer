@@ -1,5 +1,6 @@
 #include "ExpressionTree.h"
 #include "helpers/ExpressionConverter.h"
+#include <stack>
 
 std::unordered_map<char, int> ExpressionTree::s_symbolPriorityMap = {
             {'(',0},
@@ -25,14 +26,39 @@ ExpressionTree::ExpressionTree(std::string expression)
     this->GenerateTree();
 }
 
-void ExpressionTree::PrintAllLeft()
+void ExpressionTree::PrintPostfix()
 {
-    std::shared_ptr<Node> tempTop = this->m_TreeTop;
+    PrintNodeLeftFirst(this->m_TreeTop);
+}
 
-    while (tempTop != nullptr)
+void ExpressionTree::PrintPrefix()
+{
+    PrintNodeRightFirst(this->m_TreeTop);
+}
+
+void ExpressionTree::PrintNodeLeftFirst(std::shared_ptr<Node> node_to_print)
+{
+    std::cout << node_to_print->symbol;
+    if (node_to_print->pLeftNode != nullptr)
     {
-        std::cout << tempTop->symbol;
-        tempTop = tempTop->pLeftNode;
+        this->PrintNodeLeftFirst(node_to_print->pLeftNode);
+    }
+    if (node_to_print->pRightNode != nullptr)
+    {
+        this->PrintNodeLeftFirst(node_to_print->pRightNode);
+    }
+}
+
+void ExpressionTree::PrintNodeRightFirst(std::shared_ptr<Node> node_to_print)
+{
+    std::cout << node_to_print->symbol;
+    if (node_to_print->pRightNode != nullptr)
+    {
+        this->PrintNodeRightFirst(node_to_print->pRightNode);
+    }
+    if (node_to_print->pLeftNode != nullptr)
+    {
+        this->PrintNodeRightFirst(node_to_print->pLeftNode);
     }
 }
 
@@ -46,7 +72,7 @@ void ExpressionTree::GenerateTree()
     {
         bool contains_prentices = false;
 
-        for (size_t i = this->m_Expression.size() - 1; i > 0; i--) // We start right to left read so that if all have same prio the left one will be last
+        for (int i = this->m_Expression.size() - 1; i >= 0; i--) // We start right to left read so that if all have same prio the left one will be last
         {
 
             if (std::ispunct(this->m_Expression[i]) && this->m_Expression[i] != ExpressionTree::s_reservedNodeSymbol)
