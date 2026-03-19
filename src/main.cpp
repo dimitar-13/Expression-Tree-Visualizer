@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ExpressionTree.h"
+#include "ExpressionTreeBuilder.h"
 
 int main()
 {
@@ -17,11 +17,14 @@ int main()
     // (a+b)*c
     // 
 
-    ExpressionTree testTree("1-3*5^7");
+    ExpressionTreeBuilder testTree("1+1+1+1");
 
-    testTree.PrintPostfix();
-
+    for (size_t i = 0; i < 5; i++)
+    {
+        auto currentState = testTree.GetStateManager().GetNextState();
+        currentState.lock()->PrintPostfix();
+        std::cout << '\n';
+    }
     std::cout << '\n';
 
-    testTree.PrintPrefix();
 }
