@@ -1,0 +1,9 @@
+[submodule "vendor/glew/glew-cmake"]
+	path = vendor/glew/glew-cmake
+	url = https://github.com/Perlmint/glew-cmake.git
+[submodule "vendor/glfw/glfw"]
+	path = vendor/glfw/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "vendor/imgui/imgui"]
+	path = vendor/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
