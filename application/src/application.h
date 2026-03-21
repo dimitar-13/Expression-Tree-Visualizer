@@ -13,6 +13,12 @@ public:
 private:
     Application(std::unique_ptr<Window> window);
 
+    void RenderUI();
+    void RenderScene();
+
+    void InitializeImGUI();
+
 private:
+    std::string ui_expressionString;
     std::unique_ptr<Window> m_Window;
 };
