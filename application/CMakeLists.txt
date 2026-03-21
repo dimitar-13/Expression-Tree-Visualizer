@@ -31,11 +31,15 @@ set(IMGUI_SORUCES
 
 set(PROJECT_SOURCES
 	entry_point.cpp
-
+	src/window_class.cpp
+	src/application.cpp
 )
 source_group("src/" FILES ${PROJECT_SOURCES} )
 
 set(PROJECT_HEADERS
+	src/window_class.h
+	src/application.h
+
 )
 
 add_executable(${PROJECT_APPLICATION_NAME} ${PROJECT_SOURCES} ${IMGUI_SORUCES} ${PROJECT_HEADERS})
