@@ -18,7 +18,7 @@ public:
     bool ShouldWindowClose()const { return this->m_isWindowClosed; }
     void SwapBuffer()const { return glfwSwapBuffers(this->m_handle); }
     void PollEvents()const { return glfwPollEvents(); }
-    
+    GLFWwindow* GetWindowHandle()const { return m_handle; }
     ~Window();
 private:
     Window(GLFWwindow* handle,size_t width, size_t height);
