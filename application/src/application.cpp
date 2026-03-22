@@ -7,14 +7,6 @@
 bool Application::TryInitializeApplicationDependencies(size_t application_width, size_t application_height, const std::string& application_name)
 {
 
-    if (glewInit() == GL_FALSE)
-    {
-        std::cout << "Failed to initialize GLEW" << '\n';
-        return false;
-    }
-
-    glewExperimental = GL_TRUE;
-    
     std::unique_ptr<Window> application_window = Window::TryCreateWindow(application_width, application_height, application_name);
 
     if (application_window == nullptr)
@@ -23,6 +15,14 @@ bool Application::TryInitializeApplicationDependencies(size_t application_width,
         return false;
     }
 
+    if (glewInit() != GLEW_OK)
+    {
+        std::cout << "Failed to initialize GLEW" << '\n';
+        return false;
+    }
+    glewExperimental = GL_TRUE;
+
+   
     auto& instance = Application::GetApplication();
     instance.m_Window = std::move(application_window);
 
