@@ -35,6 +35,7 @@ set(PROJECT_SOURCES
 	src/application.cpp
 	src/layers/ui_layer.cpp
 	src/layers/graphics_layer.cpp
+	src/graphics/shader_class.cpp
 )
 source_group("src/" FILES ${PROJECT_SOURCES} )
 
@@ -44,6 +45,7 @@ set(PROJECT_HEADERS
 	src/layers/graphics_layer.h
 	src/layers/layer.h
 	src/layers/ui_layer.h
+	src/graphics/shader_class.h
 )
 
 add_executable(${PROJECT_APPLICATION_NAME} ${PROJECT_SOURCES} ${IMGUI_SORUCES} ${PROJECT_HEADERS})
@@ -68,7 +70,8 @@ target_compile_definitions(${PROJECT_APPLICATION_NAME} PRIVATE GLEW_STATIC)
 target_include_directories(${PROJECT_APPLICATION_NAME} PUBLIC 
 	"${PROJECT_DEPENDENCY_FOLDER}/glfw/glfw/include"
 	"${PROJECT_DEPENDENCY_FOLDER}/glew/glew-cmake/include"
-	${PROJECT_DEPENDENCY_FOLDER}/imgui/imgui
+	 ${PROJECT_DEPENDENCY_FOLDER}/imgui/imgui
+	 ${PROJECT_ROOT}/application/src
 )
 
 target_link_directories(${PROJECT_APPLICATION_NAME} PUBLIC
