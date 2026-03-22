@@ -10,15 +10,16 @@ int main()
     constexpr int kWindowWidth = 500, kWindowHeight = 700;
     char* window_name = "Test window";
 
-    std::unique_ptr<Application> application = Application::CreateApplication(kWindowWidth, kWindowHeight, window_name);
-    
-    if (application == nullptr)
+   
+    if (!Application::TryInitializeApplicationDependencies(kWindowWidth, kWindowHeight, window_name))
     {
         std::cout << "Failed to create valid application." << '\n';
         return -1;
     }
+    Application::GetApplication().InitApplication();
 
-    application->Run();
+
+    Application::GetApplication().Run();
 
     return 1;
 }
