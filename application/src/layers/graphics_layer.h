@@ -1,6 +1,6 @@
 #pragma once
 #include "layer.h"
-
+#include "graphics/batch_renderer.h"
 class GraphicsLayer : public Layer
 {
 public:
@@ -9,4 +9,6 @@ public:
     void Draw()override;
 
     void TestMethod();
+private:
+    std::unique_ptr<BatchPipeline> batch_renderer;
 };
