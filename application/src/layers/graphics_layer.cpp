@@ -1,12 +1,11 @@
 #include "graphics_layer.h"
 #include <iostream>
 #include "graphics/shader_class.h"
-
-static Shader test_shader("D:/c++/Expression Tree Visualizer/application/shaders/test_shader.glsl");
+#include <array>
 
 void GraphicsLayer::Initialize()
 {
-
+    batch_renderer = std::make_unique<BatchPipeline>();
 }
 
 void GraphicsLayer::Update()
@@ -16,6 +15,13 @@ void GraphicsLayer::Update()
 
 void GraphicsLayer::Draw()
 {
+
+    batch_renderer->PushCircle(Position2D{0,0});
+
+    batch_renderer->Draw();
+
+    batch_renderer->FlushBatch();
+
 }
 
 void GraphicsLayer::TestMethod()

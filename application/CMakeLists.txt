@@ -36,6 +36,7 @@ set(PROJECT_SOURCES
 	src/layers/ui_layer.cpp
 	src/layers/graphics_layer.cpp
 	src/graphics/shader_class.cpp
+	src/graphics/batch_renderer.cpp
 )
 source_group("src/" FILES ${PROJECT_SOURCES} )
 
@@ -46,6 +47,8 @@ set(PROJECT_HEADERS
 	src/layers/layer.h
 	src/layers/ui_layer.h
 	src/graphics/shader_class.h
+	src/graphics/batch_renderer.h
+	src/structs/Position2D.h
 )
 
 add_executable(${PROJECT_APPLICATION_NAME} ${PROJECT_SOURCES} ${IMGUI_SORUCES} ${PROJECT_HEADERS})
