@@ -21,6 +21,8 @@ public:
     void PollEvents()const { return glfwPollEvents(); }
     GLFWwindow* GetWindowHandle()const { return m_handle; }
     void SetWindowResizeCallback(std::function<void(int, int)> callback) { this->m_windowResizeApplicationCallback = callback; }
+   static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
+        GLsizei length, const char* message, const void* userParam);
 
     ~Window();
 private:

@@ -10,6 +10,7 @@ class ExpressionTreeBuilder
 public:
     ExpressionTreeBuilder(std::string expression);
     const StateManager<ExpressionTree>& GetStateManager()const { return *m_TreeStateManager; }
+    std::weak_ptr<ExpressionTree> GetTree()const { return m_Tree; }
 private:
     void BuildExpressionTree();
     void ApplyOperation(size_t symbol_index, bool remove_prentices);

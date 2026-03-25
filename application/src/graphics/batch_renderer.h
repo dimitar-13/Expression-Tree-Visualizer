@@ -4,16 +4,15 @@
 #include <memory>
 #include <array>
 #include "graphics/shader_class.h"
-#include "structs/Position2D.h"
-
+#include <glm/glm.hpp>
 constexpr size_t kSingleQuadIndexCount = 6;
 constexpr size_t kSingleQuadVertexCount = 4;
 constexpr size_t kTotalQuadCount = 100;
 
 struct Vertex
 {
-    Position2D local_position{};
-    Position2D world_position{};
+    glm::vec2 local_position;
+    glm::vec2 world_position;
 };
 
 struct BatchGpuData
@@ -31,7 +30,7 @@ public:
 
     BatchPipeline();
     void Draw();
-    void PushCircle(Position2D position);
+    void PushCircle(glm::vec2 position);
     void FlushBatch() { this->m_QuadVector.clear(); }
     Shader& GetShader() { return *m_BatchShader; }
     ~BatchPipeline();
