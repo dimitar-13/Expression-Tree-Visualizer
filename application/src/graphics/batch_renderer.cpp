@@ -36,9 +36,9 @@ BatchPipeline::BatchPipeline()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_GPU_Data.index_buffer_handle);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index_array), index_array.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, local_position));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, local_position));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, world_position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, world_position));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
@@ -66,18 +66,20 @@ void BatchPipeline::Draw()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void BatchPipeline::PushCircle(Position2D position)
+void BatchPipeline::PushCircle(glm::vec2 position)
 {
+    constexpr float kScaleFactor = 50.f;
 
     std::array<Vertex, 4> vertex_data = {
-        Vertex{ Position2D{-0.1f, -0.1f},Position2D{ -0.1f, -0.1f},},
-        Vertex{ Position2D{0.1f, -0.1f  },Position2D{ 0.1f, -0.1f }},
-        Vertex{Position2D{0.1f, 0.1f}, Position2D{ 0.1f, 0.1f}},
-        Vertex{Position2D{-0.1f, 0.1f},Position2D{ -0.1f, 0.1f},}
+        Vertex{ glm::vec2{-1.f, -1.f},glm::vec2{ -1.f, -1.f},},
+        Vertex{ glm::vec2{1.f, -1.f  },glm::vec2{ 1.f, -1.f }},
+        Vertex{glm::vec2{1.f, 1.f}, glm::vec2{ 1.f, 1.f}},
+        Vertex{glm::vec2{-1.f, 1.f},glm::vec2{ -1.f, 1.f},}
     };
 
     for (auto& vertex : vertex_data)
     {
+        vertex.world_position *= kScaleFactor;
         vertex.world_position += position;
     }
 

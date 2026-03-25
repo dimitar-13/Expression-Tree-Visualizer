@@ -28,11 +28,18 @@ Shader::Shader(const std::string& shader_file_path)
 
 }
 
-void Shader::SetUniform2D(const std::string& uniform_name, Position2D value)
+void Shader::SetUniform2D(const std::string& uniform_name, glm::vec2 value)
 {
     int uniform_location = GetUniformLocationByName(uniform_name);
 
-    glUniform2fv(uniform_location, 1, value[0]);
+    glProgramUniform2fv(this->m_programHandle,uniform_location, 1, &value[0]);
+}
+
+void Shader::SetUniformMat4x4(const std::string& uniform_name, const glm::mat4& value)
+{
+    int uniform_location = GetUniformLocationByName(uniform_name);
+
+    glProgramUniformMatrix4fv(this->m_programHandle,uniform_location, 1, GL_FALSE, &value[0][0]);
 }
 
 Shader::VertexFragmentShaderHandlePair Shader::ReadShader(const std::string& shader_file_path)
@@ -120,9 +127,9 @@ bool Shader::IsProgramLinkedSuccessfully()
 {
     int program_link_status;
 
-    glGetShaderiv(this->m_programHandle, GL_LINK_STATUS, &program_link_status);
+    glGetProgramiv(this->m_programHandle, GL_LINK_STATUS, &program_link_status);
 
-    if (!program_link_status)
+    if (program_link_status < 0)
     {
         constexpr size_t kInfoLogBufferSize = 255;
 
@@ -130,7 +137,7 @@ bool Shader::IsProgramLinkedSuccessfully()
 
         int program_info_log;
 
-        glGetShaderiv(this->m_programHandle, GL_INFO_LOG_LENGTH, &program_info_log);
+        glGetProgramiv(this->m_programHandle, GL_INFO_LOG_LENGTH, &program_info_log);
 
         glGetShaderInfoLog(this->m_programHandle, kInfoLogBufferSize * sizeof(infoLog[0]), &program_info_log, infoLog);
 
@@ -146,7 +153,7 @@ int Shader::GetUniformLocationByName(const std::string& uniform_name)const
 {
     int uniform = glGetUniformLocation(this->m_programHandle, uniform_name.c_str());
 
-    if (uniform != -1)
+    if (uniform == -1)
     {
         std::cout << "Cant find uniform with name:" << uniform_name << '\n';
     }

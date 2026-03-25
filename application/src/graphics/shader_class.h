@@ -1,14 +1,14 @@
 #pragma once
 #include <GL/glew.h>
 #include <string>
-#include "structs/Position2D.h"
-
+#include <glm/glm.hpp>
 class Shader
 {
 public:
     Shader(const std::string& shader_file_path);
     void UserProgram()const { glUseProgram(this->m_programHandle); }
-    void SetUniform2D(const std::string& uniform_name, Position2D value);
+    void SetUniform2D(const std::string& uniform_name, glm::vec2 value);
+    void SetUniformMat4x4(const std::string& uniform_name,const glm::mat4& value);
 private:
     struct VertexFragmentShaderHandlePair
     {
