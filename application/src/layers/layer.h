@@ -6,4 +6,5 @@ public:
     virtual void Initialize() {};
     virtual void Update() {};
     virtual void Draw() {};
+    virtual void OnScreenResize(int newSize,int newWidth) {};
 };

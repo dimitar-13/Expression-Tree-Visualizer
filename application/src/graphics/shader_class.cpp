@@ -28,6 +28,13 @@ Shader::Shader(const std::string& shader_file_path)
 
 }
 
+void Shader::SetUniform2D(const std::string& uniform_name, Position2D value)
+{
+    int uniform_location = GetUniformLocationByName(uniform_name);
+
+    glUniform2fv(uniform_location, 1, value[0]);
+}
+
 Shader::VertexFragmentShaderHandlePair Shader::ReadShader(const std::string& shader_file_path)
 {
     const char* kVertexShaderIdentifier = "#Shader:Vertex";
@@ -133,4 +140,16 @@ bool Shader::IsProgramLinkedSuccessfully()
     }
 
     return true;
+}
+
+int Shader::GetUniformLocationByName(const std::string& uniform_name)const
+{
+    int uniform = glGetUniformLocation(this->m_programHandle, uniform_name.c_str());
+
+    if (uniform != -1)
+    {
+        std::cout << "Cant find uniform with name:" << uniform_name << '\n';
+    }
+
+    return uniform;
 }
