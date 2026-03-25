@@ -18,7 +18,7 @@ public:
     ~Application();
 private:
     Application() = default;
-
+    void OnWindowResizeCallback(int new_widht, int new_hight);
 private:
     std::string ui_expressionString;
     std::unordered_map<std::string,std::shared_ptr<Layer>> m_layerNameMap;

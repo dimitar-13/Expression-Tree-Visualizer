@@ -33,6 +33,7 @@ public:
     void Draw();
     void PushCircle(Position2D position);
     void FlushBatch() { this->m_QuadVector.clear(); }
+    Shader& GetShader() { return *m_BatchShader; }
     ~BatchPipeline();
 
     std::vector<std::array<Vertex, 4>> m_QuadVector;

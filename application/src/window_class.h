@@ -2,6 +2,7 @@
 #include <memory>
 #include <GLFW/glfw3.h>
 #include <string>
+#include <functional>
 
 struct Size
 {
@@ -19,6 +20,8 @@ public:
     void SwapBuffer()const { return glfwSwapBuffers(this->m_handle); }
     void PollEvents()const { return glfwPollEvents(); }
     GLFWwindow* GetWindowHandle()const { return m_handle; }
+    void SetWindowResizeCallback(std::function<void(int, int)> callback) { this->m_windowResizeApplicationCallback = callback; }
+
     ~Window();
 private:
     Window(GLFWwindow* handle,size_t width, size_t height);
@@ -31,4 +34,5 @@ private:
     size_t m_windowHeight;
     bool m_isWindowClosed = false;
     GLFWwindow* m_handle;
+    std::function<void(int, int)> m_windowResizeApplicationCallback;
 };

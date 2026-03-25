@@ -62,6 +62,7 @@ void Window::OnWindowResize(int new_width, int new_height)
 {
     this->m_windowWidth = new_width;
     this->m_windowHeight = new_height;
+    this->m_windowResizeApplicationCallback(new_width, new_height);
 }
 
 void Window::OnWindowClose()

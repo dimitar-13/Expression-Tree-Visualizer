@@ -25,6 +25,11 @@ bool Application::TryInitializeApplicationDependencies(size_t application_width,
    
     auto& instance = Application::GetApplication();
     instance.m_Window = std::move(application_window);
+    auto callback_instance_bind = [&instance](int width, int height)
+        {
+            instance.OnWindowResizeCallback(width, height);
+        };
+    instance.m_Window->SetWindowResizeCallback(callback_instance_bind);
 
     return true;
 }
@@ -90,5 +95,15 @@ void Application::Run()
 
 Application::~Application()
 {
+}
+
+void Application::OnWindowResizeCallback(int new_width, int new_high)
+{
+    glViewport(0, 0, new_width, new_high);
+
+    for (auto layer_pair : this->m_layerNameMap)
+    {
+        layer_pair.second->OnScreenResize(new_width, new_high);
+    }
 }
 
