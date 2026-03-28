@@ -32,8 +32,15 @@ void ExpressionTree::AddFullNode(char left_operant, char operation, char right_o
     auto right = right_operant == ' ' ? this->m_TreeTop : std::make_shared<Node>(Node{ right_operant });
     newTop->pLeftNode = left;
     newTop->pRightNode = right;
+    left->pParentNode = newTop;
+    right->pParentNode = newTop;
 
     this->m_TreeTop = newTop;
+
+    if (m_BeginningNode == nullptr)
+    {
+        this->m_BeginningNode = left;
+    }
 }
 
 

@@ -90,7 +90,7 @@ void Application::Run()
     {
         this->m_Window->PollEvents();
 
-        glClearColor(0, 0, 1, 1);
+        glClearColor(0.35f, 0.50f, 0.75f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         for (auto layer_name_pair : this->m_layerNameMap)

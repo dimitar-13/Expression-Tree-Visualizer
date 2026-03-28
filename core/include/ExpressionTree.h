@@ -13,7 +13,9 @@ class ExpressionTree : public StateRecordable
 public:
     ExpressionTree();
 
-    const std::shared_ptr<Node> GetTreeTop()const { return m_TreeTop; }  
+    const std::shared_ptr<Node> GetTreeTop()const { return m_TreeTop; }
+    const std::shared_ptr<Node> GetTreeBeginNode()const { return m_BeginningNode; }
+
     std::shared_ptr<StateRecordable> RecordState()override;
     void AddFullNode(char left_operant, char operation, char right_operant);
 
@@ -25,4 +27,5 @@ private:
     void PrintNodeRightFirst(std::shared_ptr<Node> node_to_print);
 private:
     std::shared_ptr<Node> m_TreeTop = nullptr;
+    std::shared_ptr<Node> m_BeginningNode = nullptr;
 };
