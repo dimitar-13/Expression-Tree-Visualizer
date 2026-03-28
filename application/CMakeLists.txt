@@ -48,6 +48,7 @@ set(PROJECT_HEADERS
 	src/layers/ui_layer.h
 	src/graphics/shader_class.h
 	src/graphics/batch_renderer.h
+	src/helpers/treeSymmetryEnum.h
 )
 
 add_executable(${PROJECT_APPLICATION_NAME} ${PROJECT_SOURCES} ${IMGUI_SORUCES} ${PROJECT_HEADERS})

@@ -29,7 +29,8 @@ void main()
 	coords.x *= screen_aspect_ratio > 1.0f ? screen_aspect_ratio : 1.0f;
 	coords.y /= screen_aspect_ratio < 1.0f ? screen_aspect_ratio : 1.0f;
 
-	float multiplier = float(length(coords) <= radius);
+	float circle_smooth_value = 0.09f;
+	float color_value = 1.f - smoothstep(radius - circle_smooth_value, radius,length(coords));
 
-	FragColor = vec4(multiplier);
+	FragColor = vec4(color_value);
 }
