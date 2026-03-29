@@ -4,6 +4,8 @@
 #include "layers/ui_layer.h"
 #include "layers/graphics_layer.h"
 
+const char* Application::kDefaultExpression = "(1-2)^(2-5)";
+
 bool Application::TryInitializeApplicationDependencies(size_t application_width, size_t application_height, const std::string& application_name)
 {
 
@@ -41,13 +43,13 @@ Application& Application::GetApplication()
     return instance;
 }
 
-std::weak_ptr<Layer> Application::GetLayerByName(std::string layer_name)
+std::weak_ptr<Layer> Application::GetLayerByName(const std::string& layer_name)
 {
     if (this->m_layerNameMap.find(layer_name) != this->m_layerNameMap.end())
     {
         return this->m_layerNameMap[layer_name];
     }
-
+    std::cout << "Was not able to find layer with name:" << layer_name << '\n';
     return std::weak_ptr<Layer>();
 }
 
@@ -73,8 +75,8 @@ void Application::InitApplication()
 
     this->m_layerNameMap =
     {
-        {typeid(ui_layer).name()      ,ui_layer},
-        {typeid(drawing_layer).name() ,drawing_layer},
+        {typeid(UILayer).name()      ,ui_layer},
+        {typeid(GraphicsLayer).name() ,drawing_layer},
     };
 
     for (auto layer_name_pair : this->m_layerNameMap)

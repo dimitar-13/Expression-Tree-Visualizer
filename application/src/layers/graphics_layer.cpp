@@ -5,7 +5,11 @@
 #include "application.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-static constexpr glm::vec2 kSize = { 800,800 };
+static constexpr size_t kWindowLength = 1200;
+
+static constexpr glm::vec2 kSize = { kWindowLength,kWindowLength };
+
+static constexpr float kStartupHeight = 1000.f;
 
 static constexpr glm::vec2 KViewportMin = -(kSize / 2.f);
 static constexpr glm::vec2 KViewportMax = kSize / 2.f;
@@ -22,15 +26,12 @@ void GraphicsLayer::Initialize()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    m_OrthographicProjection = glm::ortho(KViewportMin.x, KViewportMax.x, KViewportMin.y, KViewportMax.y,-1.0f,1.0f);
+    m_OrthographicProjection = glm::ortho(0.f, kSize.x,0.f, kSize.y,-1.0f,1.0f);
 
     batch_renderer->GetLineShader().SetUniformMat4x4(kProjectionUniformName, m_OrthographicProjection);
     batch_renderer->GetCircleShader().SetUniformMat4x4(kProjectionUniformName, m_OrthographicProjection);
 
-    // (a - b) ^ (c + d)
-    // (1-2)^(2-5)
-    // 1+1+1+1 
-    GenerateTree("(1-2)^(2-5)");
+    GenerateTree(Application::kDefaultExpression);
 }
 
 void GraphicsLayer::Update()
@@ -39,10 +40,31 @@ void GraphicsLayer::Update()
 }
 
 void GraphicsLayer::Draw()
-{    
-    SubmitTreeNode(m_ExpressionTree->GetTreeTop(), this->m_TreeBaseLine);
+{
+    auto current_tree = this->m_expressionTreeStateManager->GetCurrentState().lock();
 
-    batch_renderer->Draw();
+    if (current_tree->isTreeConnected())
+    {
+        SubmitTreeNode(this->m_expressionTreeStateManager->GetCurrentState().lock()->GetTreeTop(), glm::vec2(kSize.x/2.f, kStartupHeight), kSize/glm::vec2(2.f));
+    }
+    else
+    {
+        auto top_nodes = this->m_expressionTreeStateManager->GetCurrentState().lock()->GetTreeTopNodes();
+        size_t counter = 1;
+
+        float box_width_height = static_cast<float>(kWindowLength) / static_cast<float>(top_nodes.size());
+        glm::vec2 box_size = { box_width_height / 2.f,box_width_height};
+
+        while (top_nodes.size() > 0)
+        {
+            glm::vec2 box_center = glm::vec2(box_width_height,0)* glm::vec2(counter) - glm::vec2(box_size.x, -kStartupHeight);
+            SubmitTreeNode(top_nodes.front(), box_center, box_size);
+            top_nodes.pop();
+            counter++;
+        }
+    }
+
+    batch_renderer->Draw(this->m_OrthographicProjection);
 
     batch_renderer->FlushBatch();
 }
@@ -53,80 +75,51 @@ void GraphicsLayer::OnScreenResize(int newSize, int newWidth)
     batch_renderer->GetLineShader().SetUniform2D(kWindowSizeUniformName, glm::vec2{ newSize,newWidth });
 }
 
-void GraphicsLayer::TestMethod()
+void GraphicsLayer::GoToPreviousState()
 {
-    std::cout << "This method is called from UI " << '\n';
+    this->m_expressionTreeStateManager->GetPreviousState();
 }
+
+void GraphicsLayer::GoToNextState()
+{
+    this->m_expressionTreeStateManager->GetNextState();
+}
+
 
 void GraphicsLayer::GenerateTree(const std::string& expression)
 {
     ExpressionTreeBuilder tree_builder(expression);
-    this->m_ExpressionTree = tree_builder.GetTree().lock();
-
-    constexpr float kTreeBaseLineVerticalPosition = 300.f;
-    constexpr float kTreeBaseLineHorizontalPosition = 250.f;
-    TreeSymmetry tree_symmetry = GetTreeSymmetry();
-
-    switch (tree_symmetry)
-    {
-        case TreeSymmetry::kSymmetrical :
-        this->m_TreeBaseLine = { 0.f, kTreeBaseLineVerticalPosition };
-           break;
-        
-        case TreeSymmetry::kLeftHeavy:
-            this->m_TreeBaseLine = { -kTreeBaseLineHorizontalPosition, kTreeBaseLineVerticalPosition };
-            break;
-
-        case TreeSymmetry::kRightHeavy:
-            this->m_TreeBaseLine = { kTreeBaseLineHorizontalPosition, kTreeBaseLineVerticalPosition };
-            break;
-    }
+    auto new_tree_manager = tree_builder.GetStateManager().lock();
+    this->m_expressionTreeStateManager = new_tree_manager;
+    this->m_expressionTreeStateManager->GetLastState();
 }
 
-void GraphicsLayer::SubmitTreeNode(std::shared_ptr<Node> current_node, glm::vec2 base_line, int depth)
+void GraphicsLayer::SubmitTreeNode(std::shared_ptr<Node> current_node, glm::vec2 center, const glm::vec2& half_of_size, int depth)
 {
     depth++;
     if (current_node == nullptr)
         return;
 
 
-    batch_renderer->PushCircle(base_line);
-    
-    float offset_value = 150.f / static_cast<float>(depth);
+    batch_renderer->PushCircle(center);
+    batch_renderer->PushCharacter(center, current_node->symbol);
+
+    glm::vec2 next_offset = { half_of_size.x /2.f , half_of_size.y/2.2f};
+
+
 
     if (current_node->pLeftNode)
     {
-        glm::vec2 next_node_position = base_line + glm::vec2{ -offset_value, -offset_value };
-        batch_renderer->PushLine(next_node_position, base_line);
-        this->SubmitTreeNode(current_node->pLeftNode, next_node_position, depth);
+        glm::vec2 next_center = center - next_offset;
+
+        batch_renderer->PushLine(next_center, center);
+        this->SubmitTreeNode(current_node->pLeftNode, next_center, next_offset, depth);
     }
     if (current_node->pRightNode)
     {
-        glm::vec2 next_node_position_right = base_line + glm::vec2{ offset_value, -offset_value };
+        glm::vec2 next_node_position_right = center + glm::vec2{ next_offset.x, -next_offset.y };
 
-        batch_renderer->PushLine(base_line,next_node_position_right);
-        this->SubmitTreeNode(current_node->pRightNode, next_node_position_right, depth);
+        batch_renderer->PushLine(center,next_node_position_right);
+        this->SubmitTreeNode(current_node->pRightNode, next_node_position_right, next_offset, depth);
     }
-}
-
-TreeSymmetry GraphicsLayer::GetTreeSymmetry()
-{
-    int total_left_connections = 0;
-    int total_right_connections = 0;
-
-    auto left_path_node = m_ExpressionTree->GetTreeTop();
-    auto right_path_node = m_ExpressionTree->GetTreeTop();
-
-    while (left_path_node->pLeftNode && right_path_node->pRightNode)
-    {
-        left_path_node = left_path_node->pLeftNode;
-        total_left_connections = left_path_node == nullptr ? total_left_connections : total_left_connections + 1;
-
-        right_path_node = right_path_node->pRightNode;
-        total_right_connections = right_path_node == nullptr ? total_right_connections : total_right_connections + 1;
-    }
-
-    int node_diff = total_left_connections - total_right_connections;
-
-    return node_diff == 0 ? TreeSymmetry::kSymmetrical : node_diff > 0 ? TreeSymmetry::kLeftHeavy : TreeSymmetry::kRightHeavy;
 }

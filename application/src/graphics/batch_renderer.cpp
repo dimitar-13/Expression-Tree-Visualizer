@@ -50,6 +50,8 @@ BatchPipeline::BatchPipeline()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, world_position));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coordinates));
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -57,13 +59,17 @@ BatchPipeline::BatchPipeline()
 
     this->m_CircleQuadVector.reserve(kPerPrimitiveQuadCount);
     this->m_lineQuadVector.reserve(kPerPrimitiveQuadCount);
+    this->m_fontQuadVector.reserve(kPerPrimitiveQuadCount);
+
     this->m_CircleShader = std::make_unique<Shader>("D:/c++/Expression Tree Visualizer/application/shaders/circle_shader.glsl");
     this->m_LineShader = std::make_unique<Shader>("D:/c++/Expression Tree Visualizer/application/shaders/line_shader.glsl");
+    this->m_FontShader = std::make_unique<Shader>("D:/c++/Expression Tree Visualizer/application/shaders/texture_shader.glsl");
 }
-void BatchPipeline::Draw()
+void BatchPipeline::Draw(const glm::mat4& projection)
 {
-    this->DrawLine();
-    this->DrawCircle();
+    this->DrawLine(projection);
+    this->DrawCircle(projection);
+    this->DrawFont(projection);
 }
 
 void BatchPipeline::PushCircle(glm::vec2 position)
@@ -102,6 +108,31 @@ void BatchPipeline::PushLine(const glm::vec2& line_start, const glm::vec2& line_
 
 }
 
+void BatchPipeline::PushCharacter(const glm::vec2& char_position, char character)
+{
+    std::array<Vertex, 4> vertex_data_copy = kDefaultVertexData;
+
+    for (auto& vertex : vertex_data_copy)
+    {
+        vertex.world_position *= 20.f;
+        vertex.world_position += char_position;
+    }
+
+    auto char_texture_coordinates = this->m_FontResource.GetCoordinates(character);
+
+    vertex_data_copy[0].texture_coordinates = char_texture_coordinates.start ;
+    vertex_data_copy[1].texture_coordinates = { char_texture_coordinates.end.x,char_texture_coordinates.start.y };
+    vertex_data_copy[2].texture_coordinates = char_texture_coordinates.end ;
+    vertex_data_copy[3].texture_coordinates = { char_texture_coordinates.start.x,char_texture_coordinates.end.y };
+
+    if (this->m_fontQuadVector.size() >= kPerPrimitiveQuadCount)
+    {
+        assert(false);
+        return;
+    }
+    this->m_fontQuadVector.emplace_back(vertex_data_copy);
+}
+
 BatchPipeline::~BatchPipeline()
 {
     glDeleteBuffers(1, &this->m_GPU_Data.vertex_buffer_handle);
@@ -109,7 +140,7 @@ BatchPipeline::~BatchPipeline()
     glDeleteVertexArrays(1, &this->m_GPU_Data.vertex_attribute_array_handle);
 }
 
-void BatchPipeline::DrawCircle()
+void BatchPipeline::DrawCircle(const glm::mat4& projection)
 {
     size_t circle_count = this->m_CircleQuadVector.size();
     if (circle_count == 0)
@@ -118,6 +149,8 @@ void BatchPipeline::DrawCircle()
     }
 
     this->m_CircleShader->UserProgram();
+    this->m_CircleShader->SetUniformMat4x4("u_projection", projection);
+
 
     size_t vertex_count = circle_count * 4;
 
@@ -131,7 +164,7 @@ void BatchPipeline::DrawCircle()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void BatchPipeline::DrawLine()
+void BatchPipeline::DrawLine(const glm::mat4& projection)
 {
     size_t line_count = this->m_lineQuadVector.size();
     if (line_count == 0)
@@ -139,12 +172,36 @@ void BatchPipeline::DrawLine()
         return;
     }
     this->m_LineShader->UserProgram();
+    this->m_LineShader->SetUniformMat4x4("u_projection", projection);
 
     size_t vertex_count = line_count * 4;
 
     glBindVertexArray(this->m_GPU_Data.vertex_attribute_array_handle);
     glBindBuffer(GL_ARRAY_BUFFER, this->m_GPU_Data.vertex_buffer_handle);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_count * sizeof(Vertex), this->m_lineQuadVector.data());
+
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(line_count * kSingleQuadIndexCount), GL_UNSIGNED_INT, NULL);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void BatchPipeline::DrawFont(const glm::mat4& projection)
+{
+    size_t line_count = this->m_fontQuadVector.size();
+    if (line_count == 0)
+    {
+        return;
+    }
+    this->m_FontShader->UserProgram();
+    this->m_FontShader->SetUniformMat4x4("u_projection", projection);
+    this->m_FontResource.BindTexture();
+
+    size_t vertex_count = line_count * 4;
+
+    glBindVertexArray(this->m_GPU_Data.vertex_attribute_array_handle);
+    glBindBuffer(GL_ARRAY_BUFFER, this->m_GPU_Data.vertex_buffer_handle);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_count * sizeof(Vertex), this->m_fontQuadVector.data());
 
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(line_count * kSingleQuadIndexCount), GL_UNSIGNED_INT, NULL);
 

@@ -25,10 +25,10 @@ void main()
 	float screen_aspect_ratio = u_ScreenSize.x / u_ScreenSize.y;
 	vec2 coords = FragUV;
 
-	float radius = 1.f;
-	coords.x *= screen_aspect_ratio > 1.0f ? screen_aspect_ratio : 1.0f;
-	coords.y /= screen_aspect_ratio < 1.0f ? screen_aspect_ratio : 1.0f;
+	coords.x /= screen_aspect_ratio > 1.0f ? screen_aspect_ratio : 1.0f;
+	coords.y *= screen_aspect_ratio < 1.0f ? screen_aspect_ratio : 1.0f;
 
+	float radius = 1.f;
 	float circle_smooth_value = 0.09f;
 	float color_value = 1.f - smoothstep(radius - circle_smooth_value, radius,length(coords));
 

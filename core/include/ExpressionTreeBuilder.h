@@ -9,7 +9,7 @@ class ExpressionTreeBuilder
 {
 public:
     ExpressionTreeBuilder(std::string expression);
-    const StateManager<ExpressionTree>& GetStateManager()const { return *m_TreeStateManager; }
+    std::weak_ptr<StateManager<ExpressionTree>> GetStateManager()const { return m_TreeStateManager; }
     std::weak_ptr<ExpressionTree> GetTree()const { return m_Tree; }
 private:
     void BuildExpressionTree();
@@ -17,7 +17,7 @@ private:
 private:
     std::vector<char> m_Expression;
     std::shared_ptr<ExpressionTree> m_Tree;
-    std::unique_ptr<StateManager<ExpressionTree>> m_TreeStateManager;
+    std::shared_ptr<StateManager<ExpressionTree>> m_TreeStateManager;
 private:
     static std::unordered_map<char, int> s_symbolPriorityMap;
     static char s_reservedNodeSymbol;
