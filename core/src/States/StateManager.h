@@ -35,19 +35,22 @@ inline StateManager<T>::StateManager(std::shared_ptr<T> initial_state)
 template<typename T>
 inline std::weak_ptr<T> StateManager<T>::GetLastState()const
 {
-    return std::dynamic_pointer_cast<T>(*this->m_states.end());
+    m_currentStateIndex = this->m_states.size() - 1;
+
+    return std::dynamic_pointer_cast<T>(this->m_states[m_currentStateIndex]);
 }
 
 template<typename T>
 inline std::weak_ptr<T> StateManager<T>::GetFirstState()const
 {
-    return std::dynamic_pointer_cast<T>(*this->m_states.begin());
+    m_currentStateIndex = 0;
+    return std::dynamic_pointer_cast<T>(this->m_states[m_currentStateIndex]);
 }
 
 template<typename T>
 inline std::weak_ptr<T> StateManager<T>::GetCurrentState()const
 {
-    return this->GetLastState();
+    return std::dynamic_pointer_cast<T>(m_states[m_currentStateIndex]);
 }
 
 

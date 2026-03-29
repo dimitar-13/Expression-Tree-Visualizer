@@ -15,7 +15,7 @@ int ExpressionTreeBuilder::s_PriorityMin = -1;
 ExpressionTreeBuilder::ExpressionTreeBuilder(std::string expression)
 {
     this->m_Tree = std::make_shared<ExpressionTree>();
-    this->m_TreeStateManager = std::make_unique<StateManager<ExpressionTree>>(m_Tree);
+    this->m_TreeStateManager = std::make_shared<StateManager<ExpressionTree>>(m_Tree);
 
 
     this->m_Expression.reserve(expression.length());
@@ -88,6 +88,8 @@ void ExpressionTreeBuilder::ApplyOperation(size_t symbol_index, bool remove_pren
 
         this->m_Expression.erase((this->m_Expression.begin() + (symbol_index + 1)));
         this->m_Expression.erase((this->m_Expression.begin() + (symbol_index - 1)));
+
+        this->m_TreeStateManager->SaveState();
     }
     symbol_index--;
 
@@ -97,5 +99,4 @@ void ExpressionTreeBuilder::ApplyOperation(size_t symbol_index, bool remove_pren
         this->m_Expression.erase((this->m_Expression.begin() + (symbol_index - 1)));
     }
 
-    this->m_TreeStateManager->SaveState();
 }

@@ -10,15 +10,15 @@ public:
     void Update()override;
     void Draw()override;
     void OnScreenResize(int newSize, int newWidth) override;
-    void TestMethod();
+    void GoToPreviousState();
+    void GoToNextState();
     void GenerateTree(const std::string& expression);
 private:
-    void SubmitTreeNode(std::shared_ptr<Node> current_node, glm::vec2 base_line, int depth = 0);
-    TreeSymmetry GetTreeSymmetry();
+    void SubmitTreeNode(std::shared_ptr<Node> current_node, glm::vec2 center,const glm::vec2& half_of_size, int depth = 0);
 private:
-    glm::vec2 m_TreeBaseLine = { 0,0 };
 
-    std::shared_ptr<ExpressionTree> m_ExpressionTree;
+    std::shared_ptr<StateManager<ExpressionTree>> m_expressionTreeStateManager;
+
     std::unique_ptr<BatchPipeline> batch_renderer;
     const char* kWindowSizeUniformName = "u_ScreenSize";
     const char* kProjectionUniformName = "u_projection";

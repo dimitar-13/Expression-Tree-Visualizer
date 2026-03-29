@@ -27,6 +27,12 @@ set(IMGUI_SORUCES
 	${PROJECT_DEPENDENCY_FOLDER}/imgui/imgui/imgui.cpp
 )
 
+set(STBI_IMAGE_SOURCES
+
+${PROJECT_DEPENDENCY_FOLDER}/stbi_image/stb_image.h
+${PROJECT_DEPENDENCY_FOLDER}/stbi_image/stb_image_imp.cpp
+
+)
 
 
 set(PROJECT_SOURCES
@@ -37,6 +43,7 @@ set(PROJECT_SOURCES
 	src/layers/graphics_layer.cpp
 	src/graphics/shader_class.cpp
 	src/graphics/batch_renderer.cpp
+	src/graphics/font_resource_texture.cpp
 )
 source_group("src/" FILES ${PROJECT_SOURCES} )
 
@@ -49,11 +56,14 @@ set(PROJECT_HEADERS
 	src/graphics/shader_class.h
 	src/graphics/batch_renderer.h
 	src/helpers/treeSymmetryEnum.h
+	src/graphics/font_resource_texture.h
 )
 
-add_executable(${PROJECT_APPLICATION_NAME} ${PROJECT_SOURCES} ${IMGUI_SORUCES} ${PROJECT_HEADERS})
+add_executable(${PROJECT_APPLICATION_NAME} ${PROJECT_SOURCES} ${IMGUI_SORUCES} ${PROJECT_HEADERS} ${STBI_IMAGE_SOURCES})
 
 source_group("imgui/" FILES ${IMGUI_SORUCES} )
+source_group("stbi/" FILES ${STBI_IMAGE_SOURCES} )
+
 
 set_target_properties(${PROJECT_APPLICATION_NAME} PROPERTIES 
     CXX_STANDARD 17
@@ -76,6 +86,7 @@ target_include_directories(${PROJECT_APPLICATION_NAME} PUBLIC
 	"${PROJECT_DEPENDENCY_FOLDER}/glew/glew-cmake/include"
 	"${PROJECT_DEPENDENCY_FOLDER}/glm/glm/"
 	 ${PROJECT_DEPENDENCY_FOLDER}/imgui/imgui
+	 ${PROJECT_DEPENDENCY_FOLDER}/stbi_image
 	 ${PROJECT_ROOT}/application/src
 	 ${PROJECT_ROOT}/core/include
 )
