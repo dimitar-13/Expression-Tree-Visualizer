@@ -9,15 +9,17 @@ set(PROJECT_SOURCES
     main.cpp
     ExpressionTree.cpp
     ExpressionTreeBuilder.cpp
+	ExpressionValidator.cpp
 )
 
 set(PROJECT_HEADERS 
      ${PROJECT_ROOT}/include/structs/TreeNode.h
      ${PROJECT_ROOT}/include/ExpressionTree.h
      ${PROJECT_ROOT}/include/ExpressionTreeBuilder.h
-    helpers/ExpressionConverter.h
-    States/StateRecordable.h
-    States/StateManager.h
+	 ${PROJECT_ROOT}/include/ExpressionValidator.h
+     helpers/ExpressionConverter.h
+     States/StateRecordable.h
+     States/StateManager.h
 )
 
 add_library(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS})
