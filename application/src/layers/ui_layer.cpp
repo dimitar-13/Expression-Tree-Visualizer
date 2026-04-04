@@ -6,6 +6,7 @@
 #include "../../src/application.h"
 #include <misc/cpp/imgui_stdlib.h>
 #include <misc/cpp/imgui_stdlib.cpp>
+#include <ExpressionValidator.h>
 
 size_t UILayer::kExpressionStringLength = 50;
 
@@ -20,18 +21,26 @@ void UILayer::Draw()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    
+    static bool is_expression_valid = true;
+    static std::string expression_validation_reason;
     ImGui::InputText("Expression", &this->m_expressionString, flags);
+    if (!is_expression_valid)
+    {
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s", expression_validation_reason.c_str());
+    }
 
     if (ImGui::Button("Clear expression"))
     {
         this->m_expressionString.clear();
     }
     ImGui::SameLine();
-
     if (ImGui::Button("Generate tree"))
     {
-        this->m_graphicsLayer->GenerateTree(this->m_expressionString);
+        is_expression_valid = ExpressionValidator::IsExpressionValid(this->m_expressionString, expression_validation_reason);
+        if (is_expression_valid)
+        {
+            this->m_graphicsLayer->GenerateTree(this->m_expressionString);
+        }
     }
     ImGui::SameLine();
 

@@ -71,8 +71,8 @@ void GraphicsLayer::Draw()
 
 void GraphicsLayer::OnScreenResize(int newSize, int newWidth)
 {
-
-    batch_renderer->GetLineShader().SetUniform2D(kWindowSizeUniformName, glm::vec2{ newSize,newWidth });
+    batch_renderer->GetCircleShader().UserProgram();
+    batch_renderer->GetCircleShader().SetUniform2D(kWindowSizeUniformName, glm::vec2{ newSize,newWidth });
 }
 
 void GraphicsLayer::GoToPreviousState()
