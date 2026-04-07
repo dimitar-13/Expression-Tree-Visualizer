@@ -35,9 +35,9 @@ public:
 
     BatchPipeline();
     void Draw(const glm::mat4& projection);
-    void PushCircle(glm::vec2 position);
+    void PushCircle(const glm::vec2& position,const glm::vec2& scale = glm::vec2(20.f));
     void PushLine(const glm::vec2& line_start,const glm::vec2& line_end);
-    void PushCharacter(const glm::vec2& char_position, char character);
+    void PushCharacter(const glm::vec2& char_position, char character,const glm::vec2& scale = glm::vec2(20.f));
     void FlushBatch() { this->m_CircleQuadVector.clear(); this->m_lineQuadVector.clear(); this->m_fontQuadVector.clear(); }
     Shader& GetCircleShader() { return *m_CircleShader; }
     Shader& GetLineShader() { return *m_LineShader; }

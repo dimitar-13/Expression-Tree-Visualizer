@@ -44,6 +44,8 @@ set(PROJECT_SOURCES
 	src/graphics/shader_class.cpp
 	src/graphics/batch_renderer.cpp
 	src/graphics/font_resource_texture.cpp
+	src/application_configuration_loader.cpp
+
 )
 source_group("src/" FILES ${PROJECT_SOURCES} )
 
@@ -57,6 +59,8 @@ set(PROJECT_HEADERS
 	src/graphics/batch_renderer.h
 	src/helpers/treeSymmetryEnum.h
 	src/graphics/font_resource_texture.h
+	src/application_configuration_loader.h
+    src/constants/Configurations.h
 )
 
 add_executable(${PROJECT_APPLICATION_NAME} ${PROJECT_SOURCES} ${IMGUI_SORUCES} ${PROJECT_HEADERS} ${STBI_IMAGE_SOURCES})
@@ -76,6 +80,7 @@ add_subdirectory("${PROJECT_DEPENDENCY_FOLDER}/glfw/glfw/" "${PROJECT_DEPENDENCY
 add_subdirectory("${PROJECT_DEPENDENCY_FOLDER}/glew/glew-cmake/" "${PROJECT_DEPENDENCY_FOLDER}/glew/glew-cmake/local_build")
 add_subdirectory("${PROJECT_DEPENDENCY_FOLDER}/glm/glm/" "${PROJECT_DEPENDENCY_FOLDER}/glm/glm/local_build")
 add_subdirectory("${PROJECT_ROOT}/core/src" "${PROJECT_ROOT}/build/core")
+add_subdirectory("${PROJECT_DEPENDENCY_FOLDER}/json/json/" "${PROJECT_DEPENDENCY_FOLDER}/json/json/local_build")
 
 
 target_compile_definitions(${PROJECT_APPLICATION_NAME} PRIVATE GLEW_STATIC)
@@ -85,6 +90,7 @@ target_include_directories(${PROJECT_APPLICATION_NAME} PUBLIC
 	"${PROJECT_DEPENDENCY_FOLDER}/glfw/glfw/include"
 	"${PROJECT_DEPENDENCY_FOLDER}/glew/glew-cmake/include"
 	"${PROJECT_DEPENDENCY_FOLDER}/glm/glm/"
+	"${PROJECT_DEPENDENCY_FOLDER}/json/json/include"
 	 ${PROJECT_DEPENDENCY_FOLDER}/imgui/imgui
 	 ${PROJECT_DEPENDENCY_FOLDER}/stbi_image
 	 ${PROJECT_ROOT}/application/src
@@ -107,5 +113,5 @@ target_link_libraries(${PROJECT_APPLICATION_NAME}
    	${APPLICATION_CORE_TARGET_NAME}
 
 )
-add_dependencies(${PROJECT_APPLICATION_NAME} glfw libglew_static glm TreeVisualizerCore)
+add_dependencies(${PROJECT_APPLICATION_NAME} glfw libglew_static glm TreeVisualizerCore nlohmann_json)
 

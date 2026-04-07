@@ -21,13 +21,19 @@ public:
     std::shared_ptr<StateRecordable> RecordState()override;
     void AddFullNode(char left_operant, char operation, char right_operant);
 
-    void PrintPostfix();
-    void PrintPrefix();
-
+    const std::string& GetPostfix();
+    const std::string& GetPrefix();
+    size_t GetDepth(std::shared_ptr<Node> top_node = nullptr);
 private:
-    void PrintNodeLeftFirst(std::shared_ptr<Node> node_to_print);
-    void PrintNodeRightFirst(std::shared_ptr<Node> node_to_print);
+    size_t GetDepthLeft(std::shared_ptr<Node> node);
+    size_t GetDepthRight(std::shared_ptr<Node> node);
+
+    void GetNodeLeftFirst(std::shared_ptr<Node> node_to_print, std::string& out_string);
+    void GetNodeRightFirst(std::shared_ptr<Node> node_to_print, std::string& out_string);
 private:
     std::queue<std::shared_ptr<Node>> m_TopNodes;
     std::shared_ptr<Node> m_BeginningNode = nullptr;
+    size_t m_treeDepthCached = 0;
+    std::string m_postfixCached;
+    std::string m_prefixCached;
 };

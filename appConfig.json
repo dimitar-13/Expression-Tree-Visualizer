@@ -1,0 +1,7 @@
+{
+  "ExpressionVariableLimit": "10",
+  "WindowLength": "1200",
+  "NodeStartupHeight": "1100",
+  "InitialCircleRadius": "30.f",
+  "DefaultExpression": "(1-2)^(1+5)"
+}

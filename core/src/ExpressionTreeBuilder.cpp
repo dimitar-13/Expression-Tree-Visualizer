@@ -17,9 +17,7 @@ ExpressionTreeBuilder::ExpressionTreeBuilder(std::string expression)
     this->m_Tree = std::make_shared<ExpressionTree>();
     this->m_TreeStateManager = std::make_shared<StateManager<ExpressionTree>>(m_Tree);
 
-
     this->m_Expression.reserve(expression.length());
-    ExpressionConverter::ConvertExpressionNumbersToLetters(expression);
 
     for (size_t i = 0; i < expression.length(); i++)
     {

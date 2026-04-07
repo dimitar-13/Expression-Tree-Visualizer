@@ -2,9 +2,6 @@
 #include <assert.h>
 #include <algorithm>
 
-
-static constexpr float kScaleFactor = 30.f;
-
 static constexpr std::array<Vertex, 4> kDefaultVertexData = {
     Vertex{ glm::vec2{-1.f, -1.f},glm::vec2{ -1.f, -1.f},},
     Vertex{ glm::vec2{1.f, -1.f  },glm::vec2{ 1.f, -1.f }},
@@ -72,13 +69,13 @@ void BatchPipeline::Draw(const glm::mat4& projection)
     this->DrawFont(projection);
 }
 
-void BatchPipeline::PushCircle(glm::vec2 position)
+void BatchPipeline::PushCircle(const glm::vec2& position,const glm::vec2& scale)
 {
     std::array<Vertex, 4> vertex_data_copy = kDefaultVertexData;
 
     for (auto& vertex : vertex_data_copy)
     {
-        vertex.world_position *= kScaleFactor;
+        vertex.world_position *= scale;
         vertex.world_position += position;
     }
 
@@ -108,13 +105,13 @@ void BatchPipeline::PushLine(const glm::vec2& line_start, const glm::vec2& line_
 
 }
 
-void BatchPipeline::PushCharacter(const glm::vec2& char_position, char character)
+void BatchPipeline::PushCharacter(const glm::vec2& char_position, char character,const glm::vec2& scale)
 {
     std::array<Vertex, 4> vertex_data_copy = kDefaultVertexData;
 
     for (auto& vertex : vertex_data_copy)
     {
-        vertex.world_position *= 20.f;
+        vertex.world_position *= scale;
         vertex.world_position += char_position;
     }
 

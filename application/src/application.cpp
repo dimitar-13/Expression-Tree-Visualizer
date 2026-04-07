@@ -4,7 +4,6 @@
 #include "layers/ui_layer.h"
 #include "layers/graphics_layer.h"
 
-const char* Application::kDefaultExpression = "(1-2)^(2-5)";
 
 bool Application::TryInitializeApplicationDependencies(size_t application_width, size_t application_height, const std::string& application_name)
 {

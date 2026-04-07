@@ -8,14 +8,62 @@ ExpressionTree::ExpressionTree()
  
 }
 
-void ExpressionTree::PrintPostfix()
+const std::string& ExpressionTree::GetPostfix()
 {
-    PrintNodeLeftFirst(this->m_TopNodes.front());
+    if (m_postfixCached.empty())
+    {
+        GetNodeLeftFirst(this->m_TopNodes.front(), m_postfixCached);
+    }
+
+    return m_postfixCached;
 }
 
-void ExpressionTree::PrintPrefix()
+const std::string& ExpressionTree::GetPrefix()
 {
-    PrintNodeRightFirst(this->m_TopNodes.front());
+    if (m_prefixCached.empty())
+    {
+        GetNodeRightFirst(this->m_TopNodes.front(), m_prefixCached);
+        std::reverse(m_prefixCached.begin(), m_prefixCached.end());
+    }
+
+    return m_prefixCached;
+}
+
+size_t ExpressionTree::GetDepth(std::shared_ptr<Node> top_node)
+{
+    if (this->m_treeDepthCached != 0)
+    {
+        return m_treeDepthCached;
+    }
+
+    auto top_node_to_use = top_node != nullptr ? top_node : this->m_TopNodes.front();
+
+    size_t left_depth = GetDepthLeft(top_node_to_use);
+    size_t right_depth = GetDepthRight(top_node_to_use);
+
+    this->m_treeDepthCached = std::max(left_depth, right_depth);
+
+    return m_treeDepthCached;
+}
+
+size_t ExpressionTree::GetDepthLeft(std::shared_ptr<Node> node)
+{
+    if (node->pLeftNode == nullptr)
+    {
+        return 1;
+    }
+
+    return GetDepthLeft(node->pLeftNode)+1;
+}
+
+size_t ExpressionTree::GetDepthRight(std::shared_ptr<Node> node)
+{
+    if (node->pRightNode == nullptr)
+    {
+        return 1;
+    }
+
+    return GetDepthRight(node->pRightNode) + 1;
 }
 
 std::shared_ptr<StateRecordable> ExpressionTree::RecordState()
@@ -80,29 +128,32 @@ void ExpressionTree::AddFullNode(char left_operant, char operation, char right_o
 }
 
 
-void ExpressionTree::PrintNodeLeftFirst(std::shared_ptr<Node> node_to_print)
+void ExpressionTree::GetNodeLeftFirst(std::shared_ptr<Node> node_to_print, std::string& out_string)
 {
-    std::cout << node_to_print->symbol;
+    out_string += node_to_print->symbol;
+
     if (node_to_print->pLeftNode != nullptr)
     {
-        this->PrintNodeLeftFirst(node_to_print->pLeftNode);
+        this->GetNodeLeftFirst(node_to_print->pLeftNode, out_string);
     }
     if (node_to_print->pRightNode != nullptr)
     {
-        this->PrintNodeLeftFirst(node_to_print->pRightNode);
+        this->GetNodeLeftFirst(node_to_print->pRightNode, out_string);
     }
 }
 
-void ExpressionTree::PrintNodeRightFirst(std::shared_ptr<Node> node_to_print)
+void ExpressionTree::GetNodeRightFirst(std::shared_ptr<Node> node_to_print, std::string& out_string)
 {
-    std::cout << node_to_print->symbol;
+    out_string += node_to_print->symbol;
+
     if (node_to_print->pRightNode != nullptr)
     {
-        this->PrintNodeRightFirst(node_to_print->pRightNode);
+        this->GetNodeRightFirst(node_to_print->pRightNode, out_string);
     }
     if (node_to_print->pLeftNode != nullptr)
     {
-        this->PrintNodeRightFirst(node_to_print->pLeftNode);
+        this->GetNodeRightFirst(node_to_print->pLeftNode, out_string);
     }
+
 }
 

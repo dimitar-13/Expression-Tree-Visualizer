@@ -13,8 +13,10 @@ public:
     void GoToPreviousState();
     void GoToNextState();
     void GenerateTree(const std::string& expression);
+    std::weak_ptr<ExpressionTree> GetCurrentTree()const { return this->m_expressionTreeStateManager->GetCurrentState(); }
+    const std::string& GetCurrentExpression()const { return this->m_CurrentExpression; }
 private:
-    void SubmitTreeNode(std::shared_ptr<Node> current_node, glm::vec2 center,const glm::vec2& half_of_size, int depth = 0);
+    void SubmitTreeNode(std::shared_ptr<Node> current_node, glm::vec2 center,const glm::vec2& offset, float node_radius);
 private:
 
     std::shared_ptr<StateManager<ExpressionTree>> m_expressionTreeStateManager;
@@ -22,5 +24,7 @@ private:
     std::unique_ptr<BatchPipeline> batch_renderer;
     const char* kWindowSizeUniformName = "u_ScreenSize";
     const char* kProjectionUniformName = "u_projection";
+    std::string m_CurrentExpression;
     glm::mat4 m_OrthographicProjection;
+    glm::vec2 m_ProjectionSize;
 };
