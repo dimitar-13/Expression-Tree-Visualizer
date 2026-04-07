@@ -12,7 +12,7 @@ const std::string& ExpressionTree::GetPostfix()
 {
     if (m_postfixCached.empty())
     {
-        GetNodeLeftFirst(this->m_TopNodes.front(), m_postfixCached);
+        GetNodeLeftFirst(this->GetAllActiveNodes().front(), m_postfixCached);
     }
 
     return m_postfixCached;
@@ -22,7 +22,7 @@ const std::string& ExpressionTree::GetPrefix()
 {
     if (m_prefixCached.empty())
     {
-        GetNodeRightFirst(this->m_TopNodes.front(), m_prefixCached);
+        GetNodeRightFirst(this->GetAllActiveNodes().front(), m_prefixCached);
         std::reverse(m_prefixCached.begin(), m_prefixCached.end());
     }
 
@@ -36,7 +36,7 @@ size_t ExpressionTree::GetDepth(std::shared_ptr<Node> top_node)
         return m_treeDepthCached;
     }
 
-    auto top_node_to_use = top_node != nullptr ? top_node : this->m_TopNodes.front();
+    auto top_node_to_use = top_node != nullptr ? top_node : this->GetAllActiveNodes().front();
 
     size_t left_depth = GetDepthLeft(top_node_to_use);
     size_t right_depth = GetDepthRight(top_node_to_use);
@@ -44,6 +44,22 @@ size_t ExpressionTree::GetDepth(std::shared_ptr<Node> top_node)
     this->m_treeDepthCached = std::max(left_depth, right_depth);
 
     return m_treeDepthCached;
+}
+
+const std::vector<std::shared_ptr<Node>>& ExpressionTree::GetAllActiveNodes() const
+{
+    if (this->m_AllActiveNodes.empty())
+    {
+        for (auto node : m_TopNodes)
+        {
+            if (node != nullptr)
+            {
+                m_AllActiveNodes.push_back(node);
+            }
+        }
+    }
+  
+    return m_AllActiveNodes;
 }
 
 size_t ExpressionTree::GetDepthLeft(std::shared_ptr<Node> node)
@@ -75,56 +91,39 @@ std::shared_ptr<StateRecordable> ExpressionTree::RecordState()
 
 void ExpressionTree::AddFullNode(char left_operant, char operation, char right_operant)
 {
+    constexpr size_t kAsciiZero = 48;
+
     auto newTop = std::make_shared<Node>(Node{ operation });
     std::shared_ptr<Node> left;
     std::shared_ptr<Node> right;
-    bool isLeftPopped = false;
 
-    if (left_operant == ' ')
+    if (std::isdigit(right_operant))
     {
-        auto topNode = this->m_TopNodes.front();
-        m_TopNodes.pop();
+        size_t node_index = static_cast<size_t>(right_operant) - kAsciiZero;
+        auto topNode = this->m_TopNodes[node_index];
+        right = topNode;
+        this->m_TopNodes[node_index].reset();
+    }
+    else
+    {
+        right = std::make_shared<Node>(Node{ right_operant });
+    }
+
+    if (std::isdigit(left_operant))
+    {
+        size_t node_index = static_cast<size_t>(left_operant) - kAsciiZero;
+        auto topNode = this->m_TopNodes[node_index];
         left = topNode;
-        isLeftPopped = true;
+        this->m_TopNodes[node_index].reset();
     }
     else
     {
         left = std::make_shared<Node>(Node{ left_operant });
     }
 
-    if (right_operant == ' ')
-    {
-        auto topNode = this->m_TopNodes.front();
-        m_TopNodes.pop();
-        right = topNode;
-    }
-    else
-    {
-        right = std::make_shared<Node>(Node{ right_operant });
-    }
     newTop->pLeftNode = left;
     newTop->pRightNode = right;
-    m_TopNodes.push(newTop);
-
-    if (isLeftPopped)
-    {
-        std::stack <std::shared_ptr<Node>> s;
-        std::shared_ptr<Node> temp;
-        std::shared_ptr<Node> front;
-
-        while (m_TopNodes.size() > 0)
-        {
-            front = m_TopNodes.front();
-            s.push(front);
-            m_TopNodes.pop();
-        }
-      
-        while (s.size() > 0)
-        {
-            m_TopNodes.push(s.top());
-            s.pop();
-        }
-    }
+    m_TopNodes.push_back(newTop);
 }
 
 

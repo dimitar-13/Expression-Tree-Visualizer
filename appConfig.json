@@ -3,5 +3,6 @@
   "WindowLength": "1200",
   "NodeStartupHeight": "1100",
   "InitialCircleRadius": "30.f",
-  "DefaultExpression": "(1-2)^(1+5)"
+  "DefaultExpression": "a*b+d/c^m-n^p+k*f",
+  "BottomPadding": "100"
 }

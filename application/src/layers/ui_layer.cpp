@@ -71,7 +71,7 @@ void UILayer::Draw()
     std::string tree_prefix_expression = "";
     std::string tree_expression = "";
 
-    if (auto current_tree = this->m_graphicsLayer->GetCurrentTree().lock())
+    if (auto current_tree = this->m_graphicsLayer->GetFinalTree().lock())
     {
         tree_expression = this->m_graphicsLayer->GetCurrentExpression();
         tree_postfix_expression = current_tree->GetPostfix();

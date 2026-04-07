@@ -28,7 +28,7 @@ void GraphicsLayer::Initialize()
     batch_renderer->GetLineShader().SetUniformMat4x4(kProjectionUniformName, m_OrthographicProjection);
     batch_renderer->GetCircleShader().SetUniformMat4x4(kProjectionUniformName, m_OrthographicProjection);
 
-
+    m_bottomPadding = std::stof(Application::GetApplication().GetConfiguration(Configurations::BottomPadding));
 
     GenerateTree(Application::GetApplication().GetConfiguration(Configurations::DefaultExpression));
 }
@@ -53,7 +53,7 @@ void GraphicsLayer::Draw()
             size_t tree_depth = current_tree->GetDepth();
 
             tree_depth = tree_depth % 2 == 0 ? tree_depth + 1 : tree_depth;
-            size_t vertical_offset = startup_height / tree_depth;
+            size_t vertical_offset = (startup_height / tree_depth) - m_bottomPadding;
 
             this->SubmitTreeNode(tree_top, glm::vec2(m_ProjectionSize.x / 2.f, startup_height),
                                            glm::vec2(m_ProjectionSize.x / 2.f, vertical_offset),
@@ -67,16 +67,16 @@ void GraphicsLayer::Draw()
 
         float box_width_height = static_cast<float>(m_ProjectionSize.x) / static_cast<float>(top_nodes.size());
 
-        while (top_nodes.size() > 0)
+        for (auto node : top_nodes)
         {
-            size_t tree_depth = current_tree->GetDepth(top_nodes.top());
+            size_t tree_depth = current_tree->GetDepth(node);
+            tree_depth = tree_depth % 2 == 0 ? tree_depth + 1 : tree_depth;
 
-            size_t vertical_offset = startup_height / tree_depth;
+            size_t vertical_offset = (startup_height / tree_depth) - m_bottomPadding;
             glm::vec2 box_size = { box_width_height / 2.f,vertical_offset };
 
             glm::vec2 box_center = glm::vec2(box_width_height,0)* glm::vec2(counter) - glm::vec2(box_size.x, -startup_height);
-            SubmitTreeNode(top_nodes.top(), box_center, box_size, circle_radius);
-            top_nodes.pop();
+            SubmitTreeNode(node, box_center, box_size, circle_radius);
             counter++;
         }
     }
