@@ -1,0 +1,8 @@
+{
+  "ExpressionVariableLimit": "10",
+  "WindowLength": "1200",
+  "NodeStartupHeight": "1100",
+  "InitialCircleRadius": "30.f",
+  "DefaultExpression": "a*b+d/c^m-n^p+k*f",
+  "BottomPadding": "100"
+}
