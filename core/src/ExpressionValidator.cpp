@@ -1,6 +1,5 @@
 #include "ExpressionValidator.h"
 
-
 std::unordered_map<char, char> ExpressionValidator::s_kAllowedCharacters =
 {
     { '+', '+' },
@@ -19,6 +18,8 @@ std::unordered_map<char, char> ExpressionValidator::s_kExpressionCharacters =
     {'/', '/'},
     {'^', '^'}
 };
+
+size_t ExpressionValidator::s_ExpressionCharacterLimit = 0;
 
 bool ExpressionValidator::IsExpressionValid(const std::string& expression, std::string& reason)
 {
@@ -46,8 +47,19 @@ bool ExpressionValidator::IsExpressionValid(const std::string& expression, std::
         reason = "You cannot have expression with no left or right operands: ";
         return false;
     }
+    
+    if (!ExpressionValidator::ValidateExpressionVariableLimit(expression))
+    {
+        reason = "Expression variable limit reached";
+        return false;
+    }
 
     return true;
+}
+
+void ExpressionValidator::SetExpressionCharacterLimit(size_t limit)
+{
+    s_ExpressionCharacterLimit = limit;
 }
 
 bool ExpressionValidator::IsExpressionEmpty(const std::string& expression)
@@ -107,4 +119,19 @@ bool ExpressionValidator::IsExpressionContainingNotValidOperations(const std::st
         }
     }
     return true;
+}
+
+bool ExpressionValidator::ValidateExpressionVariableLimit(const std::string& expression)
+{
+    size_t variable_counter = 0;
+ 
+    for (size_t i = 0; i < expression.size(); i++)
+    {
+        if (std::isalnum(expression[i]) || !std::ispunct(expression[i]))
+        {
+            variable_counter++;
+        }
+    }
+
+    return variable_counter <= s_ExpressionCharacterLimit;
 }

@@ -34,19 +34,21 @@ public:
     static constexpr size_t kBatchIndexArraySize = kSingleQuadIndexCount * kTotalQuadCount;
 
     BatchPipeline();
-    void Draw(const glm::mat4& projection);
-    void PushCircle(glm::vec2 position);
+    void Draw();
+    void PushCircle(const glm::vec2& position,const glm::vec2& scale = glm::vec2(20.f));
     void PushLine(const glm::vec2& line_start,const glm::vec2& line_end);
-    void PushCharacter(const glm::vec2& char_position, char character);
+    void PushCharacter(const glm::vec2& char_position, char character,const glm::vec2& scale = glm::vec2(20.f));
     void FlushBatch() { this->m_CircleQuadVector.clear(); this->m_lineQuadVector.clear(); this->m_fontQuadVector.clear(); }
     Shader& GetCircleShader() { return *m_CircleShader; }
     Shader& GetLineShader() { return *m_LineShader; }
 
+    void SetProjectionMatrix(const glm::mat4& projection_matrix) { m_ProjectionMatrix = projection_matrix; }
     ~BatchPipeline();
 private:
-    void DrawCircle(const glm::mat4& projection);
-    void DrawLine(const glm::mat4& projection);
-    void DrawFont(const glm::mat4& projection);
+    void ApplyProject(std::array<Vertex, 4>& quad);
+    void DrawCircle();
+    void DrawLine();
+    void DrawFont();
 private:
     BatchGpuData m_GPU_Data{};
     std::unique_ptr<Shader> m_CircleShader;
@@ -58,4 +60,6 @@ private:
     std::vector<std::array<Vertex, 4>> m_fontQuadVector;
 
     FontResource m_FontResource;
+
+    glm::mat4 m_ProjectionMatrix;
 };

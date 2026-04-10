@@ -7,6 +7,5 @@ struct Node
 	char symbol;
     std::shared_ptr<Node> pLeftNode = nullptr;
     std::shared_ptr<Node> pRightNode = nullptr;
-    std::shared_ptr<Node> pParentNode = nullptr;
 
 };

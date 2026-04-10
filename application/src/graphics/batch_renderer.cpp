@@ -2,9 +2,6 @@
 #include <assert.h>
 #include <algorithm>
 
-
-static constexpr float kScaleFactor = 30.f;
-
 static constexpr std::array<Vertex, 4> kDefaultVertexData = {
     Vertex{ glm::vec2{-1.f, -1.f},glm::vec2{ -1.f, -1.f},},
     Vertex{ glm::vec2{1.f, -1.f  },glm::vec2{ 1.f, -1.f }},
@@ -65,22 +62,24 @@ BatchPipeline::BatchPipeline()
     this->m_LineShader = std::make_unique<Shader>("D:/c++/Expression Tree Visualizer/application/shaders/line_shader.glsl");
     this->m_FontShader = std::make_unique<Shader>("D:/c++/Expression Tree Visualizer/application/shaders/texture_shader.glsl");
 }
-void BatchPipeline::Draw(const glm::mat4& projection)
+void BatchPipeline::Draw()
 {
-    this->DrawLine(projection);
-    this->DrawCircle(projection);
-    this->DrawFont(projection);
+    this->DrawLine();
+    this->DrawCircle();
+    this->DrawFont();
 }
 
-void BatchPipeline::PushCircle(glm::vec2 position)
+void BatchPipeline::PushCircle(const glm::vec2& position,const glm::vec2& scale)
 {
     std::array<Vertex, 4> vertex_data_copy = kDefaultVertexData;
 
     for (auto& vertex : vertex_data_copy)
     {
-        vertex.world_position *= kScaleFactor;
+        vertex.world_position *= scale;
         vertex.world_position += position;
     }
+
+    this->ApplyProject(vertex_data_copy);
 
     if (this->m_CircleQuadVector.size() >= kPerPrimitiveQuadCount)
     {
@@ -99,6 +98,8 @@ void BatchPipeline::PushLine(const glm::vec2& line_start, const glm::vec2& line_
     vertex_data_copy[2].world_position = line_end;
     vertex_data_copy[3].world_position = { line_start.x,line_end.y };
 
+    this->ApplyProject(vertex_data_copy);
+
     if (this->m_lineQuadVector.size() >= kPerPrimitiveQuadCount)
     {
         assert(false);
@@ -108,15 +109,17 @@ void BatchPipeline::PushLine(const glm::vec2& line_start, const glm::vec2& line_
 
 }
 
-void BatchPipeline::PushCharacter(const glm::vec2& char_position, char character)
+void BatchPipeline::PushCharacter(const glm::vec2& char_position, char character,const glm::vec2& scale)
 {
     std::array<Vertex, 4> vertex_data_copy = kDefaultVertexData;
 
     for (auto& vertex : vertex_data_copy)
     {
-        vertex.world_position *= 20.f;
+        vertex.world_position *= scale;
         vertex.world_position += char_position;
     }
+
+    this->ApplyProject(vertex_data_copy);
 
     auto char_texture_coordinates = this->m_FontResource.GetCoordinates(character);
 
@@ -140,7 +143,15 @@ BatchPipeline::~BatchPipeline()
     glDeleteVertexArrays(1, &this->m_GPU_Data.vertex_attribute_array_handle);
 }
 
-void BatchPipeline::DrawCircle(const glm::mat4& projection)
+void BatchPipeline::ApplyProject(std::array<Vertex, 4>& quad)
+{
+    for (auto& vertex : quad)
+    {
+        vertex.world_position = m_ProjectionMatrix * glm::vec4(vertex.world_position, 0.f, 1.f);
+    }
+}
+
+void BatchPipeline::DrawCircle()
 {
     size_t circle_count = this->m_CircleQuadVector.size();
     if (circle_count == 0)
@@ -149,7 +160,6 @@ void BatchPipeline::DrawCircle(const glm::mat4& projection)
     }
 
     this->m_CircleShader->UserProgram();
-    this->m_CircleShader->SetUniformMat4x4("u_projection", projection);
 
 
     size_t vertex_count = circle_count * 4;
@@ -164,7 +174,7 @@ void BatchPipeline::DrawCircle(const glm::mat4& projection)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void BatchPipeline::DrawLine(const glm::mat4& projection)
+void BatchPipeline::DrawLine()
 {
     size_t line_count = this->m_lineQuadVector.size();
     if (line_count == 0)
@@ -172,7 +182,6 @@ void BatchPipeline::DrawLine(const glm::mat4& projection)
         return;
     }
     this->m_LineShader->UserProgram();
-    this->m_LineShader->SetUniformMat4x4("u_projection", projection);
 
     size_t vertex_count = line_count * 4;
 
@@ -186,7 +195,7 @@ void BatchPipeline::DrawLine(const glm::mat4& projection)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void BatchPipeline::DrawFont(const glm::mat4& projection)
+void BatchPipeline::DrawFont()
 {
     size_t line_count = this->m_fontQuadVector.size();
     if (line_count == 0)
@@ -194,7 +203,6 @@ void BatchPipeline::DrawFont(const glm::mat4& projection)
         return;
     }
     this->m_FontShader->UserProgram();
-    this->m_FontShader->SetUniformMat4x4("u_projection", projection);
     this->m_FontResource.BindTexture();
 
     size_t vertex_count = line_count * 4;

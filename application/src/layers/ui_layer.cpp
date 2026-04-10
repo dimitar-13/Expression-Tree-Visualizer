@@ -7,6 +7,8 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <misc/cpp/imgui_stdlib.cpp>
 #include <ExpressionValidator.h>
+#include "constants/Configurations.h"
+
 
 size_t UILayer::kExpressionStringLength = 50;
 
@@ -21,6 +23,7 @@ void UILayer::Draw()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+
     static bool is_expression_valid = true;
     static std::string expression_validation_reason;
     ImGui::InputText("Expression", &this->m_expressionString, flags);
@@ -46,21 +49,39 @@ void UILayer::Draw()
 
     if (ImGui::Button("Load default expression"))
     {
-        this->m_expressionString = Application::kDefaultExpression;
+        this->m_expressionString = Application::GetApplication().GetConfiguration(Configurations::DefaultExpression);
     }
     ImGui::Separator();
 
 
-    if (ImGui::Button("Previous"))
+    if (ImGui::Button("<"))
     {
         this->m_graphicsLayer->GoToPreviousState();
     }
     ImGui::SameLine();
 
-    if (ImGui::Button("Next"))
+    if (ImGui::Button(">"))
     {
         this->m_graphicsLayer->GoToNextState();
     }
+    ImGui::Separator();
+
+
+    std::string tree_postfix_expression = "";
+    std::string tree_prefix_expression = "";
+    std::string tree_expression = "";
+
+    if (auto current_tree = this->m_graphicsLayer->GetFinalTree().lock())
+    {
+        tree_expression = this->m_graphicsLayer->GetCurrentExpression();
+        tree_postfix_expression = current_tree->GetPostfix();
+        tree_prefix_expression = current_tree->GetPrefix();
+    }
+
+    ImGui::Text("Tree Data");
+    ImGui::Text("Expression:'%s'", tree_expression.c_str());
+    ImGui::Text("Postfix expression:'%s'", tree_postfix_expression.c_str());
+    ImGui::Text("Prefix expression:'%s'", tree_prefix_expression.c_str());
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -79,7 +100,7 @@ void UILayer::Initialize()
     ImGui_ImplOpenGL3_Init();
 
     this->m_expressionString.reserve(kExpressionStringLength);
-    this->m_expressionString = Application::kDefaultExpression;
+    this->m_expressionString = Application::GetApplication().GetConfiguration(Configurations::DefaultExpression);
 
     auto graphics_layer = Application::GetApplication().GetLayerByName(typeid(GraphicsLayer).name());
 
@@ -87,5 +108,9 @@ void UILayer::Initialize()
     {
         this->m_graphicsLayer = std::dynamic_pointer_cast<GraphicsLayer>(graphics_layer.lock());
     }
+
+    auto variable_limit = Application::GetApplication().GetConfiguration(Configurations::ExpressionVariableLimit);
+
+    ExpressionValidator::SetExpressionCharacterLimit(std::stoi(variable_limit));
 
 }

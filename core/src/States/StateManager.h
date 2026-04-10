@@ -10,6 +10,7 @@ class StateManager
 {
 public:
     StateManager(std::shared_ptr<T> initial_state);
+    std::weak_ptr<T> GetLastStateNotMove()const;
     std::weak_ptr<T> GetLastState()const;
     std::weak_ptr<T> GetFirstState()const;
     std::weak_ptr<T> GetCurrentState()const;
@@ -39,7 +40,11 @@ inline std::weak_ptr<T> StateManager<T>::GetLastState()const
 
     return std::dynamic_pointer_cast<T>(this->m_states[m_currentStateIndex]);
 }
-
+template<typename T>
+inline std::weak_ptr<T> StateManager<T>::GetLastStateNotMove() const
+{
+    return std::dynamic_pointer_cast<T>(*(this->m_states.end() - 1));
+}
 template<typename T>
 inline std::weak_ptr<T> StateManager<T>::GetFirstState()const
 {

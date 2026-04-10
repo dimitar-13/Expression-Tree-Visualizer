@@ -13,7 +13,7 @@ public:
     std::weak_ptr<ExpressionTree> GetTree()const { return m_Tree; }
 private:
     void BuildExpressionTree();
-    void ApplyOperation(size_t symbol_index, bool remove_prentices);
+    void ApplyOperation(size_t symbol_index, bool remove_prentices, size_t symbol_vector_index);
 private:
     std::vector<char> m_Expression;
     std::shared_ptr<ExpressionTree> m_Tree;
