@@ -13,9 +13,6 @@ void GraphicsLayer::Initialize()
     batch_renderer = std::make_unique<BatchPipeline>();
     Size application_window_size = Application::GetApplication().GetWindow().GetWindowSize();
 
-    glm::vec2 window_size_to_position = { application_window_size.x,application_window_size.y };
-    batch_renderer->GetLineShader().SetUniform2D(kWindowSizeUniformName, window_size_to_position);
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -23,10 +20,7 @@ void GraphicsLayer::Initialize()
 
     m_ProjectionSize = { window_length,window_length };
 
-    m_OrthographicProjection = glm::ortho(0.f, m_ProjectionSize.x,0.f, m_ProjectionSize.y,-1.0f,1.0f);
-
-    batch_renderer->GetLineShader().SetUniformMat4x4(kProjectionUniformName, m_OrthographicProjection);
-    batch_renderer->GetCircleShader().SetUniformMat4x4(kProjectionUniformName, m_OrthographicProjection);
+    OnScreenResize(application_window_size.x, application_window_size.y);
 
     m_bottomPadding = std::stof(Application::GetApplication().GetConfiguration(Configurations::BottomPadding));
 
@@ -81,15 +75,28 @@ void GraphicsLayer::Draw()
         }
     }
 
-    this->batch_renderer->Draw(this->m_OrthographicProjection);
+    this->batch_renderer->Draw();
 
     this->batch_renderer->FlushBatch();
 }
 
-void GraphicsLayer::OnScreenResize(int newSize, int newWidth)
+void GraphicsLayer::OnScreenResize(int newWidth, int newHeight)
 {
-    this->batch_renderer->GetCircleShader().UserProgram();
-    this->batch_renderer->GetCircleShader().SetUniform2D(kWindowSizeUniformName, glm::vec2{ newSize,newWidth });
+    int window_length = std::stoi(Application::GetApplication().GetConfiguration(Configurations::WindowLength));
+
+    float aspect = static_cast<float>(newWidth) / static_cast<float>(newHeight);
+    if (aspect > 1.f)
+    {
+        this->m_ProjectionSize.x = window_length * aspect;
+    }
+    else if (aspect < 1.f)
+    {
+        this->m_ProjectionSize.y = window_length / aspect;
+    }
+
+    m_OrthographicProjection = glm::ortho(0.f, m_ProjectionSize.x, 0.f, m_ProjectionSize.y, -1.0f, 1.0f);
+    
+    this->batch_renderer->SetProjectionMatrix(m_OrthographicProjection);
 }
 
 void GraphicsLayer::GoToPreviousState()

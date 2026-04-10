@@ -3,12 +3,10 @@
 layout(location = 0) in vec2 local_position;
 layout(location = 1) in vec2 world_position;
 
-uniform mat4 u_projection;
-
 out vec2 FragUV;
 void main()
 {
-	gl_Position = u_projection * vec4(world_position,0.0f,1);
+	gl_Position = vec4(world_position,0.0f,1);
 	FragUV = local_position;
 }
 
